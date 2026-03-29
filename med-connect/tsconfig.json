@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "src/app/api/auth/[...nextauth]/route.js", "services/authService.js", "src/app/layout.jsx", "src/app/provider.jsx"  ],
+, "src/app/api/auth/[...nextauth]/route.ts", "services/authService.ts", "src/app/layout.jsx", "src/app/provider.jsx"  ],
   "exclude": ["node_modules"]
 }
