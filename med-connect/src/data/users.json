@@ -10,5 +10,11 @@
     "username": "zain",
     "email": "zain@gmail.com",
     "password": "zain"
+  },
+  {
+    "id": 3,
+    "username": "zain",
+    "email": "bilal@gmail.com",
+    "password": "$2b$12$L5Oefn7/3ZeULSabw21PWuOAISFp8imPT4dahgC1r6XHYi7brxoNa"
   }
 ]
