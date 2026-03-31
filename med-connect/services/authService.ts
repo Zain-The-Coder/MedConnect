@@ -1,9 +1,9 @@
 import { hash, compare } from "bcrypt";
-import { Prisma } from "@prisma/client";
+
 import { prisma } from "../src/app/api/lib/prisma";
 import path from "path";
 import fs from "fs";
-import { Role } from "@prisma/client"; // Prisma ka apna enum import karo
+import { PrismaClient, Role } from "@prisma/client"; // Prisma ka apna enum import karo
 
 export type UserRole = "ADMIN" | "DOCTOR" | "RECEPTIONIST" | "PATIENT";
 
@@ -58,7 +58,7 @@ export async function saveData(name: string, email: string, password: string) {
   const hashedPassword = await hash(password, 12);
 
   // Transaction: Create User AND Patient profile
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return await prisma.$transaction(async (tx) => {
     const newUser = await tx.user.create({
       data: {
         name,
