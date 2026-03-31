@@ -3,7 +3,7 @@ import { hash, compare } from "bcrypt";
 import { prisma } from "../src/app/api/lib/prisma";
 import path from "path";
 import fs from "fs";
-import { Role } from "@prisma/client"; // Prisma ka apna enum import karo
+
 
 export type UserRole = "ADMIN" | "DOCTOR" | "RECEPTIONIST" | "PATIENT";
 
