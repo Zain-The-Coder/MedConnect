@@ -3,10 +3,14 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { DashboardHeader, AdminDashboard, DoctorDashboard, PatientDashboard } from "@/components";
+import { AdminDashboard, DoctorDashboard, PatientDashboard, DashboardHeader } from "@/components";
 import { CustomCursor } from "@/components/CustomCursor";
 
-export default function DashboardPage() {
+interface RolePageProps {
+  params: Promise<{ role: string }>;
+}
+
+export default function RolePage({ params }: RolePageProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -38,20 +42,6 @@ export default function DashboardPage() {
     role?: string;
   };
 
-  const renderDashboard = () => {
-    const userRole = user.role?.toUpperCase();
-    
-    switch (userRole) {
-      case "ADMIN":
-        return <AdminDashboard user={user} />;
-      case "DOCTOR":
-        return <DoctorDashboard user={user} />;
-      case "PATIENT":
-      default:
-        return <PatientDashboard user={user} />;
-    }
-  };
-
   return (
     <>
       <CustomCursor />
@@ -61,9 +51,31 @@ export default function DashboardPage() {
           userRole={user.role || "Patient"}
         />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {renderDashboard()}
+          <RoleDashboard user={user} />
         </main>
       </div>
     </>
   );
+}
+
+function RoleDashboard({ user }: { user: { id: string; name?: string | null; email?: string | null; role?: string } }) {
+  const role = user.role?.toUpperCase();
+  
+  switch (role) {
+    case "ADMIN":
+      return <AdminDashboard user={user} />;
+    case "DOCTOR":
+      return <DoctorDashboard user={user} />;
+    case "PATIENT":
+      return <PatientDashboard user={user} />;
+    default:
+      return (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid Role</h1>
+            <p className="text-gray-500">Your role is not recognized. Please contact support.</p>
+          </div>
+        </div>
+      );
+  }
 }

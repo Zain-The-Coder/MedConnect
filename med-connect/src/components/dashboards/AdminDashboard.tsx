@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components";
 
 interface User {
-  id: number;
+  id: string;
   username: string;
   email: string;
   role?: string;
@@ -23,22 +23,20 @@ interface AdminDashboardProps {
 const roleColors: Record<string, { bg: string; text: string; border: string }> = {
   admin: { bg: "bg-purple-100", text: "text-purple-700", border: "border-purple-200" },
   doctor: { bg: "bg-blue-100", text: "text-blue-700", border: "border-blue-200" },
-  receptionist: { bg: "bg-amber-100", text: "text-amber-700", border: "border-amber-200" },
   patient: { bg: "bg-blue-100", text: "text-blue-700", border: "border-blue-200" },
 };
 
-const roleOptions = ["admin", "doctor", "receptionist", "patient"];
+const roleOptions = ["admin", "doctor", "patient"];
 
 export function AdminDashboard({ user }: AdminDashboardProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingUser, setEditingUser] = useState<number | null>(null);
+  const [editingUser, setEditingUser] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState("");
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalDoctors: 0,
     totalPatients: 0,
-    totalReceptionists: 0,
   });
 
   useEffect(() => {
@@ -57,7 +55,6 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
           totalUsers: data.users.length,
           totalDoctors: data.users.filter((u: User) => u.role === "doctor").length,
           totalPatients: data.users.filter((u: User) => u.role === "patient").length,
-          totalReceptionists: data.users.filter((u: User) => u.role === "receptionist").length,
         });
       }
     } catch (error) {
@@ -67,7 +64,7 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
     }
   };
 
-  const handleRoleUpdate = async (userId: number) => {
+  const handleRoleUpdate = async (userId: string) => {
     if (!selectedRole) return;
 
     try {
@@ -91,7 +88,6 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
           totalUsers: updatedUsers.length,
           totalDoctors: updatedUsers.filter((u: User) => u.role === "doctor").length,
           totalPatients: updatedUsers.filter((u: User) => u.role === "patient").length,
-          totalReceptionists: updatedUsers.filter((u: User) => u.role === "receptionist").length,
         });
       }
     } catch (error) {
@@ -127,7 +123,7 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6 bg-linear-to-br from-purple-500 to-purple-600 text-white border-0 shadow-lg shadow-purple-500/20 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
@@ -165,20 +161,6 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 bg-linear-to-br from-amber-500 to-amber-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 hover:-translate-y-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-amber-100 text-sm font-medium">Receptionists</p>
-              <p className="text-4xl font-bold mt-1">{stats.totalReceptionists}</p>
-            </div>
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
             </div>
           </div>

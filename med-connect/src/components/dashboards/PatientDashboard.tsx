@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { Card, Button } from "@/components";
 
 interface Appointment {
-  id: number;
-  patientId: number;
+  id: string;
+  patientId: string;
   patientName: string;
   patientEmail: string;
-  doctorId: number;
+  doctorId: string;
   doctorName: string;
   date: string;
   time: string;
@@ -17,10 +17,13 @@ interface Appointment {
 }
 
 interface Doctor {
-  id: number;
+  id: string;
   username: string;
   email: string;
   role: string;
+  specialization?: string;
+  fee?: number;
+  isAvailable?: boolean;
 }
 
 interface PatientDashboardProps {
@@ -37,7 +40,6 @@ const statusColors: Record<string, { bg: string; text: string; icon: string }> =
   confirmed: { bg: "bg-emerald-100", text: "text-emerald-700", icon: "✓" },
   completed: { bg: "bg-blue-100", text: "text-blue-700", icon: "✓✓" },
   cancelled: { bg: "bg-red-100", text: "text-red-700", icon: "✗" },
-  rejected: { bg: "bg-slate-100", text: "text-slate-700", icon: "✗" },
 };
 
 export function PatientDashboard({ user }: PatientDashboardProps) {
@@ -100,7 +102,7 @@ export function PatientDashboard({ user }: PatientDashboardProps) {
     e.preventDefault();
     if (!selectedDoctor || !appointmentForm.date || !appointmentForm.time) return;
 
-    const doctor = doctors.find((d) => d.id === parseInt(selectedDoctor));
+    const doctor = doctors.find((d) => d.id === selectedDoctor);
     if (!doctor) return;
 
     setSubmitting(true);
@@ -109,11 +111,8 @@ export function PatientDashboard({ user }: PatientDashboardProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          patientId: parseInt(user.id),
-          patientName: user.name,
-          patientEmail: user.email,
-          doctorId: parseInt(selectedDoctor),
-          doctorName: doctor.username,
+          patientId: user.id,
+          doctorId: selectedDoctor,
           date: appointmentForm.date,
           time: appointmentForm.time,
           reason: appointmentForm.reason,
@@ -145,7 +144,7 @@ export function PatientDashboard({ user }: PatientDashboardProps) {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Section - Light Blue Theme */}
+      {/* Welcome Section */}
       <div className="bg-linear-to-r from-blue-500 via-blue-600 to-cyan-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-500/20">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -168,7 +167,7 @@ export function PatientDashboard({ user }: PatientDashboardProps) {
         </div>
       </div>
 
-      {/* Stats Grid - Light Blue Theme */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6 bg-linear-to-br from-blue-500 to-blue-600 text-white border-0 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 hover:-translate-y-1">
           <div className="flex items-center justify-between">
@@ -250,7 +249,8 @@ export function PatientDashboard({ user }: PatientDashboardProps) {
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-slate-800">Dr. {doctor.username}</p>
-                    <p className="text-sm text-slate-500">{doctor.email}</p>
+                    <p className="text-sm text-slate-500">{doctor.specialization || "General"}</p>
+                    <p className="text-xs text-slate-400">{doctor.email}</p>
                   </div>
                 </div>
               ))}
@@ -376,7 +376,7 @@ export function PatientDashboard({ user }: PatientDashboardProps) {
                   <option value="">Choose a doctor</option>
                   {doctors.map((doctor) => (
                     <option key={doctor.id} value={doctor.id}>
-                      Dr. {doctor.username}
+                      Dr. {doctor.username} {doctor.specialization ? `- ${doctor.specialization}` : ""}
                     </option>
                   ))}
                 </select>

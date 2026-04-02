@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { updateUserRole, UserRole } from "../../../../../services/authService";
+import { prisma } from "../../lib/prisma";
 
 export async function PATCH(
   request: Request,
@@ -10,22 +10,47 @@ export async function PATCH(
     const body = await request.json();
     const { role } = body;
 
-    const validRoles: UserRole[] = ["ADMIN", "DOCTOR", "RECEPTIONIST", "PATIENT"];
-    
-    if (!role || !validRoles.includes(role)) {
+    const validRoles = ["ADMIN", "DOCTOR", "PATIENT"];
+    const upperRole = role?.toUpperCase();
+
+    if (!upperRole || !validRoles.includes(upperRole)) {
       return NextResponse.json(
-        { errorMessage: "Invalid role. Must be one of: ADMIN, DOCTOR, RECEPTIONIST, PATIENT" },
+        { errorMessage: "Invalid role. Must be one of: admin, doctor, patient" },
         { status: 400 }
       );
     }
 
-    const success = updateUserRole(id, role);
+    await prisma.user.update({
+      where: { id },
+      data: { role: upperRole as any },
+    });
 
-    if (!success) {
-      return NextResponse.json(
-        { errorMessage: "User not found" },
-        { status: 404 }
-      );
+    if (upperRole === "DOCTOR") {
+      const existingDoctor = await prisma.doctor.findUnique({
+        where: { userId: id },
+      });
+      if (!existingDoctor) {
+        await prisma.doctor.create({
+          data: {
+            userId: id,
+            specialization: "General",
+            qualifications: "",
+            experience: 0,
+            fee: 0,
+          },
+        });
+      }
+    }
+
+    if (upperRole === "PATIENT") {
+      const existingPatient = await prisma.patient.findUnique({
+        where: { userId: id },
+      });
+      if (!existingPatient) {
+        await prisma.patient.create({
+          data: { userId: id },
+        });
+      }
     }
 
     return NextResponse.json(
