@@ -27,15 +27,7 @@
     "email": "hussian@gmail.com",
     "password": "$2b$12$fZ6tAeOXOHV/fwPlXHJvauln9fjUi1gnKgqw9qSMD.BB.WwCaTLom"
   },
-  {
-    "id": 5,
-    "username": "Reception Staff",
-    "email": "reception@test.com",
-    "password": "$2b$12$p9oVudEXexIk/F7p1I6Lcub6eejfnLuTr8Xqw85qldIVWKsW8Qp3S",
-    "role": "receptionist",
-    "createdAt": "2026-03-29T00:00:00.000Z"
-  },
-  {
+{
     "id": 6,
     "username": "John Patient",
     "email": "patient1@test.com",

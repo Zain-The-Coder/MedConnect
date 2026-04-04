@@ -4,13 +4,12 @@ import { prisma } from "../src/app/api/lib/prisma";
 import path from "path";
 import fs from "fs";
 
-
-export type UserRole = "ADMIN" | "DOCTOR" | "RECEPTIONIST" | "PATIENT";
+export type UserRole = "ADMIN" | "DOCTOR" | "PATIENT";
 
 export interface UserData {
   id: number;
   username: string;
-  email: string; 
+  email: string;
   password?: string;
   role?: UserRole;
   createdAt?: string;
@@ -27,27 +26,29 @@ export function getAllUsers(): UserData[] {
   }
 }
 
-
-// 2. Verify Password (Purana logic, same rahega)
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+// Verify Password
+export async function verifyPassword(
+  password: string,
+  hashedPassword: string
+): Promise<boolean> {
   return await compare(password, hashedPassword);
 }
 
-// 3. Get User By Email (Ab Database se check karega)
+// Get User By Email
 export async function getByEmail(email: string) {
   return await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
   });
 }
 
-// 4. Get User By ID
+// Get User By ID
 export async function getById(id: string) {
   return await prisma.user.findUnique({
     where: { id: id },
   });
 }
 
-// 5. Save Data (Signup Logic - Modified to handle both)
+// Signup Logic
 export async function saveData(name: string, email: string, password: string) {
   const found = await getByEmail(email);
 
@@ -57,18 +58,16 @@ export async function saveData(name: string, email: string, password: string) {
 
   const hashedPassword = await hash(password, 12);
 
-  // Transaction: Create User AND Patient profile
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient ) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const newUser = await tx.user.create({
       data: {
         name,
         email: email.toLowerCase(),
         password: hashedPassword,
-        role: "PATIENT", // Default Role
+        role: "PATIENT",
       },
     });
 
-    // Automatically create patient profile
     await tx.patient.create({
       data: {
         userId: newUser.id,
@@ -79,12 +78,13 @@ export async function saveData(name: string, email: string, password: string) {
   });
 }
 
+// Update User Role
 export async function updateUserRole(id: string, newRole: UserRole) {
   try {
     await prisma.user.update({
       where: { id: id },
-      data: { 
-        role: newRole as any ,
+      data: {
+        role: newRole as any,
       },
     });
     return true;
@@ -93,6 +93,7 @@ export async function updateUserRole(id: string, newRole: UserRole) {
   }
 }
 
+// Get All Doctors
 export async function getAllDoctors() {
   return await prisma.user.findMany({
     where: { role: "DOCTOR" },

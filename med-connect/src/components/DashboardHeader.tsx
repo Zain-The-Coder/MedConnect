@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 interface DashboardHeaderProps {
   userName?: string;
@@ -14,40 +15,13 @@ export default function DashboardHeader({
 }: DashboardHeaderProps) {
   const pathname = usePathname();
 
-  const getNavLinks = () => {
-    switch (userRole.toLowerCase()) {
-      case "admin":
-        return [
-          { href: "/admin", label: "Dashboard" },
-          { href: "/admin?tab=appointments", label: "Appointments" },
-          { href: "/admin?tab=users", label: "Users" },
-        ];
-      case "doctor":
-        return [
-          { href: "/doctor", label: "Dashboard" },
-          { href: "/doctor?tab=appointments", label: "Appointments" },
-          { href: "/doctor?tab=patients", label: "Patients" },
-        ];
-      case "patient":
-        return [
-          { href: "/patient", label: "Dashboard" },
-          { href: "/patient?tab=appointments", label: "Appointments" },
-          { href: "/patient?tab=profile", label: "Profile" },
-        ];
-      default:
-        return [{ href: "/", label: "Home" }];
-    }
-  };
-
-  const navLinks = getNavLinks();
-
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
+          <Link href="/dashboard" className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
               <svg
                 className="w-6 h-6 text-white"
                 fill="none"
@@ -62,26 +36,23 @@ export default function DashboardHeader({
                 />
               </svg>
             </div>
-            <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
               MedConnect
             </span>
           </Link>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                  pathname === link.href || pathname.startsWith(link.href.split("?")[0])
-                    ? "bg-blue-50 text-blue-600"
-                    : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            <Link
+              href="/dashboard"
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                pathname === "/dashboard" || pathname.startsWith("/dashboard")
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+              }`}
+            >
+              Dashboard
+            </Link>
           </nav>
 
           {/* User Menu */}
@@ -92,11 +63,11 @@ export default function DashboardHeader({
               </span>
               <span className="text-xs text-gray-500 capitalize">{userRole}</span>
             </div>
-            <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
               {userName.charAt(0).toUpperCase()}
             </div>
-            <Link
-              href="/login"
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
               className="p-2 text-gray-500 hover:text-red-600 transition-colors"
               title="Logout"
             >
@@ -113,7 +84,7 @@ export default function DashboardHeader({
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
-            </Link>
+            </button>
           </div>
         </div>
       </div>
