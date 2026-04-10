@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, Button } from "@/components";
+import PatientForm from "../PatientForm";
 
 interface Appointment {
   id: string;
@@ -339,6 +340,9 @@ export function PatientDashboard({ user }: PatientDashboardProps) {
           </div>
         )}
       </Card>
+
+      {/* Patient Profile Section */}
+      <PatientForm />
 
       {/* New Appointment Modal */}
       {showNewAppointment && (
