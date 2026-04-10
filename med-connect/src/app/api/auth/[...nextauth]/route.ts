@@ -7,6 +7,7 @@ import { prisma } from "../../lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
+  debug : true ,
   session: { strategy: "jwt" },
   
   secret: process.env.NEXTAUTH_SECRET, 
@@ -15,19 +16,22 @@ export const authOptions: NextAuthOptions = {
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
           GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            // User ka role default PATIENT rakhne ke liye profile callback
-            profile(profile) {
-              return {
-                id: profile.sub,
-                name: profile.name,
-                email: profile.email,
-                image: profile.picture,
-                role: "PATIENT", // Google user default patient hoga
-              };
-            },
-          }),
+  clientId: process.env.GOOGLE_CLIENT_ID!,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+  httpOptions: {
+    timeout: 10000,
+  },
+  profile(profile) {
+    return {
+      id: profile.sub,
+      name: profile.name || profile.given_name,
+      email: profile.email,
+      image: profile.picture,
+      role: "PATIENT",
+      emailVerified: new Date(),
+    };
+  },
+}),
         ]
       : []),
     CredentialsProvider({

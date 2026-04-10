@@ -8,11 +8,12 @@ datasource db {
 
 model User {
   id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
+  name      String?
+  email     String?    @unique
   image     String?
   role      Role      @default(PATIENT)
-  createdAt DateTime  @default(now())
+  emailVerified DateTime? 
+  createdAt DateTime?  @default(now())
   password  String?
   accounts  Account[]
   sessions  Session[]
