@@ -7,13 +7,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
+  id        String    @id @default(cuid())
+  name      String?
+  email     String?    @unique
   image     String?
-  role      Role     @default(PATIENT)
-  createdAt DateTime @default(now())
+  role      Role      @default(PATIENT)
+  emailVerified DateTime? 
+  createdAt DateTime?  @default(now())
   password  String?
+  accounts  Account[]
+  sessions  Session[]
   doctor    Doctor?
   patient   Patient?
 }
@@ -97,4 +100,31 @@ enum DayOfWeek {
   FRI
   SAT
   SUN
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
